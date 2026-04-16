@@ -24,6 +24,11 @@ export default function Login() {
             <AppText>Se connecter</AppText>
           </TouchableOpacity>
         </View>
+        <View style={{flex: 0, alignItems: 'center', justifyContent: 'center'}}>
+          <TouchableOpacity onPress={() => router.push('/(auth)/resetMdp')}>
+            <AppText>mot de passe oublié ?</AppText>
+          </TouchableOpacity>
+        </View>
       </View>
     </Screen>
   )
