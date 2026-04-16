@@ -14,10 +14,10 @@ export const colors = {
 }
 
 export const typography = {
-  title:    { fontSize: 22, fontWeight: '700' as const, color: colors.navy },
+  title:    { fontSize: 22, fontWeight: '700' as const, color: colors.white },
   subtitle: { fontSize: 16, fontWeight: '500' as const, color: colors.gray800 },
   body:     { fontSize: 14, fontWeight: '400' as const, color: colors.gray800 },
-  label:    { fontSize: 12, fontWeight: '400' as const, color: colors.gray600 },
+  label:    { fontSize: 12, fontWeight: '400' as const, color: colors.white },
 }
 
 export const spacing = {

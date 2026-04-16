@@ -1,24 +1,44 @@
 import { View, Text, TextInput, TouchableOpacity } from 'react-native'
 import { router } from 'expo-router'
 import { colors, typography, spacing } from '../constants/theme'
+import Screen from '../components/Screen'
+import AppText from '../components/AppText'
 
 export default function Login() {
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={typography.title}>Connexion</Text>
-      <View>
-        <Text style={typography.label}>Email :</Text>
-        <TextInput
-          defaultValue="identifiant"
-        />
-        <Text style={typography.label}>Mot de passe :</Text>
-        <TextInput
-          defaultValue="mot de passe"
-        />
+    <Screen>
+      <AppText style={typography.title}>Connexion</AppText>
+        <View style={styles.container}>
+        <View style={styles.form}>
+          <AppText style={typography.label}>Email :</AppText>
+          <TextInput style={styles.input}
+            defaultValue="compte_test_identifiant"
+          />
+          <AppText style={typography.label}>Mot de passe :</AppText>
+          <TextInput style={styles.input}
+            defaultValue="compte_test_mdp"
+          />
+        </View>
+        <View style={{flex: 0, alignItems: 'center', justifyContent: 'center'}}>
+          <TouchableOpacity onPress={() => router.push('/(app)/dashboard')}>
+            <AppText>Se connecter</AppText>
+          </TouchableOpacity>
+        </View>
       </View>
-      <TouchableOpacity onPress={() => router.push('/(app)/dashboard')}>
-        <Text>Se connecter</Text>
-      </TouchableOpacity>
-    </View>
+    </Screen>
   )
+}
+
+const styles = {
+  container: {
+    flex: 1,
+    paddingTop: 120,
+  },
+  form: {
+    marginVertical: 20,
+  },
+  input: {
+    backgroundColor: colors.white,
+    borderRadius: 4,
+  }
 }
