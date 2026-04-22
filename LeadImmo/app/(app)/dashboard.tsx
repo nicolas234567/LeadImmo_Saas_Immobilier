@@ -1,4 +1,5 @@
-import { View, StyleSheet, Text } from 'react-native'
+import { View, StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { router } from 'expo-router'
 import Screen from '../components/Screen'
 import AppText from '../components/AppText'
 import { typography, colors} from '../constants/theme'
@@ -37,7 +38,7 @@ export default function Dashboard() {
         <AppText style={styles.texte}>Dernier leads :</AppText>
         <View style={styles.list}>
           {mockLeads.map(lead => (
-            <View key={lead.id} style={styles.row}>
+            <TouchableOpacity key={lead.id} style={styles.row} onPress={() => router.push(`/(app)/leads/${lead.id}`)}>
               <View style={styles.avatar}>
                 <AppText style={styles.avatarText}>{lead.name[0]}</AppText>
               </View>
@@ -48,7 +49,7 @@ export default function Dashboard() {
               <View style={[styles.statut, { backgroundColor: STATUS_COLORS[lead.status] ?? '#9CA3AF' }]}>
                 <AppText style={styles.statutText}>{lead.status}</AppText>
               </View>
-            </View>
+            </TouchableOpacity>
           ))}
         </View>
       </View>

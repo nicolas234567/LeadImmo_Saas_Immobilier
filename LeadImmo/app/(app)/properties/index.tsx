@@ -1,7 +1,8 @@
-import { View, Image, Text, StyleSheet } from 'react-native'
+import { View, Image, Text, StyleSheet, TouchableOpacity } from 'react-native'
+import { router } from 'expo-router'
 import Screen from '../../components/Screen'
 import AppText from '../../components/AppText'
-import { mockPropertiesDetail } from '../../constants/mockData'
+import { getProperties } from '../../services/properties'
 import { colors, spacing, radius } from '../../constants/theme'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -21,18 +22,25 @@ function formatPrice(price: number) {
 }
 
 export default function Properties() {
+  const properties = getProperties()
+
   return (
     <Screen>
       <AppText style={styles.title}>Mes Biens</AppText>
 
       <View style={styles.list}>
-        {mockPropertiesDetail.map(property => (
-          <View key={property.id} style={styles.card}>
+        {properties.map(property => (
+          <TouchableOpacity
+            key={property.id}
+            style={styles.card}
+            onPress={() => router.push(`/(app)/properties/${property.id}`)}
+            activeOpacity={0.8}
+          >
             <Image source={property.image} style={styles.image} />
 
             <View style={styles.body}>
               <View style={styles.row}>
-                <Text style={[styles.propertyTitle]} numberOfLines={1}>
+                <Text style={styles.propertyTitle} numberOfLines={1}>
                   {property.title}
                 </Text>
                 <View style={[styles.badge, { backgroundColor: STATUS_COLORS[property.status] ?? colors.lightGray }]}>
@@ -47,7 +55,7 @@ export default function Properties() {
                 <AppText style={styles.leads}>{property.leadsCount} lead{property.leadsCount !== 1 ? 's' : ''}</AppText>
               </View>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </Screen>

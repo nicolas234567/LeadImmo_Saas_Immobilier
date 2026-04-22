@@ -40,6 +40,8 @@ export default function AppLayout() {
           ),
         }}
       />
+      <Tabs.Screen name="leads/[id]" options={{ href: null }} />
+      <Tabs.Screen name="properties/[id]" options={{ href: null }} />
     </Tabs>
   )
 }

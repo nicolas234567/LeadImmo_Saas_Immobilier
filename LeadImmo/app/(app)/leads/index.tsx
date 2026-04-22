@@ -1,7 +1,8 @@
-import { View, StyleSheet } from 'react-native'
+import { View, StyleSheet, TouchableOpacity } from 'react-native'
+import { router } from 'expo-router'
 import Screen from '../../components/Screen'
 import AppText from '../../components/AppText'
-import { mockLeads } from '../../constants/mockData'
+import { getLeads } from '../../services/leads'
 import { colors } from '../../constants/theme'
 
 const STATUS_COLORS: Record<string, string> = {
@@ -12,24 +13,31 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export default function Leads() {
+  const leads = getLeads()
+
   return (
     <Screen>
       <AppText style={styles.title}>Mes Leads</AppText>
 
       <View style={styles.list}>
-        {mockLeads.map(lead => (
-          <View key={lead.id} style={styles.row}>
-              <View style={styles.avatar}>
-                <AppText style={styles.avatarText}>{lead.name[0]}</AppText>
-              </View>
-              <View>
-                <AppText style={styles.name}>{lead.name}</AppText>
-                <AppText style={styles.property}>{lead.propertyTitle}</AppText>
-              </View>
+        {leads.map(lead => (
+          <TouchableOpacity
+            key={lead.id}
+            style={styles.row}
+            onPress={() => router.push(`/(app)/leads/${lead.id}`)}
+            activeOpacity={0.75}
+          >
+            <View style={styles.avatar}>
+              <AppText style={styles.avatarText}>{lead.name[0]}</AppText>
+            </View>
+            <View style={styles.info}>
+              <AppText style={styles.name}>{lead.name}</AppText>
+              <AppText style={styles.property}>{lead.propertyTitle}</AppText>
+            </View>
             <View style={[styles.statut, { backgroundColor: STATUS_COLORS[lead.status] ?? '#9CA3AF' }]}>
               <AppText style={styles.statutText}>{lead.status}</AppText>
             </View>
-          </View>
+          </TouchableOpacity>
         ))}
       </View>
     </Screen>
@@ -37,57 +45,60 @@ export default function Leads() {
 }
 
 const styles = StyleSheet.create({
-  title: { 
-    fontSize: 22, 
-    fontWeight: 'bold' 
+  title: {
+    fontSize: 22,
+    fontWeight: 'bold',
   },
   list: {
     marginTop: 20,
     gap: 12,
-    width: '100%'
+    width: '100%',
   },
-  row: { 
-    flexDirection: 'row', 
+  row: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between', 
-    padding: 20, 
+    justifyContent: 'space-between',
+    padding: 20,
     paddingHorizontal: 20,
-    backgroundColor: '#fff', 
-    borderRadius: 12 
+    backgroundColor: '#fff',
+    borderRadius: 12,
   },
-  avatar: { 
-    width: 44, 
-    height: 44, 
-    borderRadius: 22, 
-    backgroundColor: colors.blue, 
-    alignItems: 'center', 
-    justifyContent: 'center'
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: colors.blue,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  avatarText: { 
-    color: '#fff', 
-    fontWeight: 'bold', 
-    fontSize: 20 
+  avatarText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 20,
   },
-  name: { 
-    fontSize: 18, 
-    fontWeight: '600', 
-    color: colors.lightGray
+  info: {
+    flex: 1,
+    marginLeft: 12,
   },
-  property: { 
-    fontSize: 15, 
-    color: colors.lightGray 
+  name: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: colors.lightGray,
   },
-  // statut
-  statut: { 
-    paddingHorizontal: 12, 
-    paddingVertical: 6, 
+  property: {
+    fontSize: 15,
+    color: colors.lightGray,
+  },
+  statut: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
     borderRadius: 12,
     width: 100,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
-  statutText: { 
-    color: '#fff', 
-    fontWeight: '600' 
+  statutText: {
+    color: '#fff',
+    fontWeight: '600',
   },
 })

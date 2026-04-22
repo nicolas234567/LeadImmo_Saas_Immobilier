@@ -23,9 +23,9 @@ Application mobile de gestion de leads immobiliers, développée avec React Nati
 ## Fonctionnalités
 
 - **Tableau de bord** — KPIs et aperçu de l'activité
-- **Leads** — Suivi et gestion des leads entrants
-- **Biens** — Consultation et gestion des propriétés
-- **Authentification** — Connexion, réinitialisation du mot de passe
+- **Leads** — Suivi et gestion des leads entrants, fiche détail par lead
+- **Biens** — Consultation et gestion des propriétés, fiche détail par bien
+- **Authentification** — Inscription, connexion, réinitialisation du mot de passe
 
 ## Stack technique
 
@@ -49,10 +49,24 @@ npm run ios      # iOS
 
 ```
 app/
-├── (auth)/       # Connexion, réinitialisation du mot de passe
-├── (app)/        # Écrans authentifiés
+├── (auth)/            # Inscription, connexion, réinitialisation du mot de passe
+│   ├── login.tsx
+│   ├── register.tsx
+│   ├── resetMdp.tsx
+│   └── confirmationResetMdp.tsx
+├── (app)/             # Écrans authentifiés
 │   ├── dashboard.tsx
 │   ├── leads/
+│   │   ├── index.tsx
+│   │   └── [id].tsx   # Fiche détail lead
 │   └── properties/
+│       ├── index.tsx
+│       └── [id].tsx   # Fiche détail bien
+├── services/          # Couche d'accès aux données (mock → API)
+│   ├── leads.ts
+│   └── properties.ts
+├── types/             # Types TypeScript
+│   ├── lead.ts
+│   └── property.ts
 └── _layout.tsx
 ```

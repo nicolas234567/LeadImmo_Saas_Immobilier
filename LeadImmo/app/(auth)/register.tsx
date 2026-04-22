@@ -5,29 +5,58 @@ import { colors, typography, spacing } from '../constants/theme'
 import Screen from '../components/Screen'
 import AppText from '../components/AppText'
 
-type FormErrors = { email?: string; password?: string }
+function isValidEmail(email: string) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
 
-export default function Login() {
+type FormErrors = { email?: string; password?: string; confirm?: string }
+
+export default function Register() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [confirm, setConfirm] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
+  const [done, setDone] = useState(false)
 
   function validate(): FormErrors {
     const e: FormErrors = {}
     if (!email) e.email = 'Email requis'
+    else if (!isValidEmail(email)) e.email = 'Format email invalide'
     if (!password) e.password = 'Mot de passe requis'
+    else if (password.length < 8) e.password = 'Minimum 8 caractères'
+    if (!confirm) e.confirm = 'Confirmation requise'
+    else if (confirm !== password) e.confirm = 'Les mots de passe ne correspondent pas'
     return e
   }
 
   function handleSubmit() {
     const e = validate()
     setErrors(e)
-    if (Object.keys(e).length === 0) router.push('/(app)/dashboard')
+    if (Object.keys(e).length === 0) setDone(true)
+  }
+
+  if (done) {
+    return (
+      <Screen>
+        <View style={styles.successContainer}>
+          <AppText style={styles.successIcon}>✓</AppText>
+          <AppText style={[typography.title, { textAlign: 'center', marginBottom: spacing.sm }]}>
+            Compte créé !
+          </AppText>
+          <AppText style={styles.successMsg}>
+            Votre compte a bien été créé. Vous pouvez maintenant vous connecter.
+          </AppText>
+          <TouchableOpacity style={styles.button} onPress={() => router.replace('/(auth)/login')}>
+            <AppText style={styles.buttonText}>Se connecter</AppText>
+          </TouchableOpacity>
+        </View>
+      </Screen>
+    )
   }
 
   return (
     <Screen>
-      <AppText style={typography.title}>Connexion</AppText>
+      <AppText style={typography.title}>Créer un compte</AppText>
 
       <View style={styles.form}>
         <View style={styles.field}>
@@ -48,7 +77,7 @@ export default function Login() {
           <AppText style={styles.label}>Mot de passe</AppText>
           <TextInput
             style={[styles.input, errors.password ? styles.inputError : null]}
-            placeholder="Votre mot de passe"
+            placeholder="Minimum 8 caractères"
             placeholderTextColor={colors.lightGray}
             secureTextEntry
             value={password}
@@ -57,18 +86,27 @@ export default function Login() {
           {errors.password ? <AppText style={styles.errorText}>{errors.password}</AppText> : null}
         </View>
 
-        <TouchableOpacity onPress={() => router.push('/(auth)/resetMdp')}>
-          <AppText style={styles.forgotLink}>Mot de passe oublié ?</AppText>
-        </TouchableOpacity>
+        <View style={styles.field}>
+          <AppText style={styles.label}>Confirmer le mot de passe</AppText>
+          <TextInput
+            style={[styles.input, errors.confirm ? styles.inputError : null]}
+            placeholder="Répétez le mot de passe"
+            placeholderTextColor={colors.lightGray}
+            secureTextEntry
+            value={confirm}
+            onChangeText={t => { setConfirm(t); setErrors(e => ({ ...e, confirm: undefined })) }}
+          />
+          {errors.confirm ? <AppText style={styles.errorText}>{errors.confirm}</AppText> : null}
+        </View>
 
         <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <AppText style={styles.buttonText}>Se connecter</AppText>
+          <AppText style={styles.buttonText}>Créer mon compte</AppText>
         </TouchableOpacity>
 
-        <View style={styles.registerRow}>
-          <AppText style={styles.registerText}>Pas encore de compte ? </AppText>
-          <TouchableOpacity onPress={() => router.push('/(auth)/register')}>
-            <AppText style={styles.registerLink}>Créer un compte</AppText>
+        <View style={styles.loginRow}>
+          <AppText style={styles.loginText}>Déjà un compte ? </AppText>
+          <TouchableOpacity onPress={() => router.back()}>
+            <AppText style={styles.loginLink}>Se connecter</AppText>
           </TouchableOpacity>
         </View>
       </View>
@@ -106,11 +144,6 @@ const styles = StyleSheet.create({
     color: colors.red,
     fontSize: 12,
   },
-  forgotLink: {
-    color: colors.lightGray,
-    fontSize: 13,
-    textAlign: 'right',
-  },
   button: {
     backgroundColor: colors.blue,
     borderRadius: 10,
@@ -123,18 +156,36 @@ const styles = StyleSheet.create({
     fontWeight: '700' as const,
     fontSize: 16,
   },
-  registerRow: {
+  loginRow: {
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
   },
-  registerText: {
+  loginText: {
     color: colors.lightGray,
     fontSize: 14,
   },
-  registerLink: {
+  loginLink: {
     color: colors.blue,
     fontSize: 14,
     fontWeight: '600' as const,
+  },
+  successContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: spacing.md,
+    paddingHorizontal: spacing.xl,
+  },
+  successIcon: {
+    fontSize: 56,
+    color: colors.green,
+    fontWeight: '700' as const,
+  },
+  successMsg: {
+    color: colors.white,
+    fontSize: 15,
+    textAlign: 'center',
+    marginBottom: spacing.md,
   },
 })

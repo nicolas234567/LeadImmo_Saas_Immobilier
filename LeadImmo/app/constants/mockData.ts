@@ -1,4 +1,7 @@
-export const mockLeads = [
+import type { Lead } from '../types/lead'
+import type { Property } from '../types/property'
+
+export const mockLeads: Lead[] = [
   {
     id: '1',
     name: 'Sophie Martin',
@@ -8,6 +11,9 @@ export const mockLeads = [
     propertyId: '1',
     propertyTitle: 'Appartement 3P — 11e',
     createdAt: '2026-04-10',
+    budget: 480000,
+    source: 'SeLoger',
+    notes: 'Cherche un bien spacieux avec balcon. Disponible les week-ends pour les visites.',
   },
   {
     id: '2',
@@ -18,6 +24,10 @@ export const mockLeads = [
     propertyId: '2',
     propertyTitle: 'Maison — Massy',
     createdAt: '2026-04-11',
+    budget: 400000,
+    source: 'LeBonCoin',
+    notes: 'Famille avec 2 enfants, cherche jardin. Préfère le RDC ou 1er étage.',
+    visitDate: '2026-04-20',
   },
   {
     id: '3',
@@ -28,6 +38,10 @@ export const mockLeads = [
     propertyId: '1',
     propertyTitle: 'Appartement 3P — 11e',
     createdAt: '2026-04-12',
+    budget: 460000,
+    source: 'Recommandation',
+    notes: 'Très intéressée, a visité 2 fois. Attend le retour de son banquier.',
+    visitDate: '2026-04-18',
   },
   {
     id: '4',
@@ -38,6 +52,10 @@ export const mockLeads = [
     propertyId: '3',
     propertyTitle: 'Loft — 3e',
     createdAt: '2026-04-13',
+    budget: 640000,
+    source: 'Site web',
+    notes: 'Offre à 610 000 € déposée. En attente de la réponse du vendeur.',
+    visitDate: '2026-04-15',
   },
   {
     id: '5',
@@ -48,10 +66,13 @@ export const mockLeads = [
     propertyId: '2',
     propertyTitle: 'Maison — Massy',
     createdAt: '2026-04-14',
+    budget: 390000,
+    source: 'SeLoger',
+    notes: 'Premier achat. Cherche à être proche des transports en commun.',
   },
 ]
 
-export const mockProperties = [
+export const mockProperties: Property[] = [
   {
     id: '1',
     title: 'Appartement 3P — 11e',
@@ -86,12 +107,11 @@ export const mockProperties = [
   },
 ]
 
-// Données dashboard
 export const mockKpis = {
   activeLeads: 24,
   availableProperties: 18,
   visitsThisWeek: 7,
-  pendingOffers: 3 
+  pendingOffers: 3,
 }
 
 export const mockRecentLeads = [
@@ -132,8 +152,7 @@ export const mockRecentLeads = [
   },
 ]
 
-// Donnée biens
-export const mockPropertiesDetail = [
+export const mockPropertiesDetail: Property[] = [
   {
     id: '1',
     title: 'Appartement 3P — 11e',
@@ -142,6 +161,11 @@ export const mockPropertiesDetail = [
     status: 'available',
     leadsCount: 3,
     image: require('../../assets/images/properties/appart1.jpeg'),
+    surface: 72,
+    rooms: 3,
+    type: 'Appartement',
+    description:
+      'Bel appartement lumineux au 3e étage avec ascenseur. Double exposition, parquet en chêne, cuisine équipée. Proche métro Voltaire.',
   },
   {
     id: '2',
@@ -151,6 +175,11 @@ export const mockPropertiesDetail = [
     status: 'under_offer',
     leadsCount: 2,
     image: require('../../assets/images/properties/maison1.jpeg'),
+    surface: 110,
+    rooms: 5,
+    type: 'Maison',
+    description:
+      'Maison de ville avec jardin de 80 m². Garage, cave, 4 chambres. Secteur calme, à 5 min du RER B.',
   },
   {
     id: '3',
@@ -160,6 +189,11 @@ export const mockPropertiesDetail = [
     status: 'available',
     leadsCount: 1,
     image: require('../../assets/images/properties/loft1.jpeg'),
+    surface: 95,
+    rooms: 2,
+    type: 'Loft',
+    description:
+      'Loft d\'exception en plein Marais. Hauteur sous plafond 3,5 m, verrières industrielles, cuisine ouverte haut de gamme.',
   },
   {
     id: '4',
@@ -169,5 +203,10 @@ export const mockPropertiesDetail = [
     status: 'sold',
     leadsCount: 0,
     image: require('../../assets/images/properties/appart2.jpeg'),
+    surface: 28,
+    rooms: 1,
+    type: 'Studio',
+    description:
+      'Studio idéalement situé au cœur de Saint-Germain-des-Prés. Entièrement rénové, immeuble haussmannien.',
   },
 ]
