@@ -9,9 +9,9 @@ Application mobile de gestion de leads immobiliers, développée avec React Nati
 ## Captures d'écran
 
 <p align="center">
-  <img src="../screenshot demo/dashboard.png" width="30%" alt="Tableau de bord" />
-  <img src="../screenshot demo/leads.png" width="30%" alt="Leads" />
-  <img src="../screenshot demo/biens.png" width="30%" alt="Biens" />
+  <img src="screenshot demo/dashboard.png" width="30%" alt="Tableau de bord" />
+  <img src="screenshot demo/leads.png" width="30%" alt="Leads" />
+  <img src="screenshot demo/biens.png" width="30%" alt="Biens" />
 </p>
 
 <p align="center">
