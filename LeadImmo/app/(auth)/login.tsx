@@ -4,6 +4,7 @@ import { router } from 'expo-router'
 import { colors, typography, spacing } from '../constants/theme'
 import Screen from '../components/Screen'
 import AppText from '../components/AppText'
+import { login, saveToken } from '../services/auth'
 
 type FormErrors = { email?: string; password?: string }
 
@@ -11,6 +12,8 @@ export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
+  const [loading, setLoading] = useState(false)
+  const [apiError, setApiError] = useState<string | null>(null)
 
   function validate(): FormErrors {
     const e: FormErrors = {}
@@ -19,10 +22,24 @@ export default function Login() {
     return e
   }
 
-  function handleSubmit() {
+  async function handleSubmit() {
+    // verifier que les champs sont remplis
     const e = validate()
     setErrors(e)
-    if (Object.keys(e).length === 0) router.push('/(app)/dashboard')
+    if (Object.keys(e).length > 0) return
+
+    setLoading(true)
+    setApiError(null)
+
+    try {
+      const token = await login(email, password)
+      await saveToken(token)
+      router.push('/(app)/dashboard')
+    } catch (err: any) {
+      setApiError(err.message ?? 'Erreur de connexion')
+    } finally {
+      setLoading(false)
+    }
   }
 
   return (
@@ -61,8 +78,10 @@ export default function Login() {
           <AppText style={styles.forgotLink}>Mot de passe oublié ?</AppText>
         </TouchableOpacity>
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <AppText style={styles.buttonText}>Se connecter</AppText>
+        {apiError ? <AppText style={styles.errorText}>{apiError}</AppText> : null}
+
+        <TouchableOpacity style={[styles.button, loading && styles.buttonDisabled]} onPress={handleSubmit} disabled={loading}>
+          <AppText style={styles.buttonText}>{loading ? 'Connexion…' : 'Se connecter'}</AppText>
         </TouchableOpacity>
 
         <View style={styles.registerRow}>
@@ -117,6 +136,9 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     alignItems: 'center',
     marginTop: spacing.sm,
+  },
+  buttonDisabled: {
+    opacity: 0.6,
   },
   buttonText: {
     color: colors.white,

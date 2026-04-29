@@ -1,6 +1,6 @@
 import * as SecureStore from 'expo-secure-store'
+import { API_URL } from '../constants/config'
 
-const API_URL = 'http://192.168.39.79:3000'
 const TOKEN_KEY = 'auth_token'
 
 export async function login(email: string, password: string): Promise<string> {

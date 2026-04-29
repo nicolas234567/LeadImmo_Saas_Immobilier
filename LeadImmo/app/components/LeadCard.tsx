@@ -4,16 +4,24 @@ import AppText from './AppText'
 import { colors } from '../constants/theme'
 
 export const STATUS_COLORS: Record<string, string> = {
-  nouveau: '#3B82F6',
-  'En contact': '#F59E0B',
-  visite: '#8B5CF6',
-  offre: '#10B981',
+  new: '#3B82F6',
+  contacted: '#F59E0B',
+  visiting: '#8B5CF6',
+  offer: '#10B981',
+}
+
+export const STATUS_LABELS: Record<string, string> = {
+  new: 'Nouveau',
+  contacted: 'En contact',
+  visiting: 'Visite',
+  offer: 'Offre',
 }
 
 type Lead = {
   id: string
   name: string
-  propertyTitle: string
+  property_id: string
+  property_title?: string
   status: string
 }
 
@@ -29,10 +37,10 @@ export default function LeadCard({ lead }: { lead: Lead }) {
       </View>
       <View style={styles.info}>
         <AppText style={styles.name}>{lead.name}</AppText>
-        <AppText style={styles.property}>{lead.propertyTitle}</AppText>
+        <AppText style={styles.property}>{lead.property_title ?? `Bien #${lead.property_id}`}</AppText>
       </View>
       <View style={[styles.statut, { backgroundColor: STATUS_COLORS[lead.status] ?? '#9CA3AF' }]}>
-        <AppText style={styles.statutText}>{lead.status}</AppText>
+        <AppText style={styles.statutText}>{STATUS_LABELS[lead.status] ?? lead.status}</AppText>
       </View>
     </TouchableOpacity>
   )

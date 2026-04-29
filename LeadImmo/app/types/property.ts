@@ -8,6 +8,7 @@ export interface Property {
   status: PropertyStatus
   leadsCount: number
   image?: any
+  image_mimetype?: string
   surface?: number
   rooms?: number
   description?: string

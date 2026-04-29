@@ -1,13 +1,30 @@
-import { mockLeads } from '../constants/mockData'
+import { apiFetch } from '../constants/api'
 import type { Lead } from '../types/lead'
 
-// Pour passer à une vraie API : remplacer le corps de chaque fonction
-// par un appel fetch, ex: return fetch('/api/leads').then(r => r.json())
-
-export function getLeads(): Lead[] {
-  return mockLeads
+export function getLeads(): Promise<Lead[]> {
+  return apiFetch<Lead[]>('/leads')
 }
 
-export function getLead(id: string): Lead | undefined {
-  return mockLeads.find(l => l.id === id)
+export function getLead(id: string): Promise<Lead> {
+  return apiFetch<Lead>(`/leads/${id}`)
+}
+
+export function createLead(data: {
+  property_id: string | null
+  name: string
+  email: string
+  phone: string
+  status: string
+  budget?: number
+  notes?: string
+}): Promise<Lead> {
+  return apiFetch<Lead>('/leads', { method: 'POST', body: data })
+}
+
+export function updateLead(id: string, data: Partial<Lead>): Promise<Lead> {
+  return apiFetch<Lead>(`/leads/${id}`, { method: 'PATCH', body: data })
+}
+
+export function deleteLead(id: string): Promise<unknown> {
+  return apiFetch<unknown>(`/leads/${id}`, { method: 'DELETE' })
 }
