@@ -15,3 +15,10 @@ export interface Lead {
   notes?: string
   visit_date?: string
 }
+
+export const STATUSES: { value: LeadStatus; label: string }[] = [
+  { value: 'new',       label: 'Nouveau'    },
+  { value: 'contacted', label: 'En contact' },
+  { value: 'visiting',  label: 'Visite'     },
+  { value: 'offer',     label: 'Offre'      },
+]

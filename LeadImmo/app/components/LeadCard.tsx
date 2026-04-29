@@ -2,6 +2,7 @@ import { View, StyleSheet, TouchableOpacity } from 'react-native'
 import { router } from 'expo-router'
 import AppText from './AppText'
 import { colors } from '../constants/theme'
+import type { Lead } from '../types/lead'
 
 export const STATUS_COLORS: Record<string, string> = {
   new: '#3B82F6',
@@ -17,13 +18,6 @@ export const STATUS_LABELS: Record<string, string> = {
   offer: 'Offre',
 }
 
-type Lead = {
-  id: string
-  name: string
-  property_id: string
-  property_title?: string
-  status: string
-}
 
 export default function LeadCard({ lead }: { lead: Lead }) {
   return (

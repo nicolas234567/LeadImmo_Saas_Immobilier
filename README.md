@@ -25,7 +25,7 @@ Application mobile de gestion de leads immobiliers, développée avec React Nati
 - **Tableau de bord** — KPIs et aperçu de l'activité
 - **Leads** — Suivi et gestion des leads entrants, fiche détail par lead (statut, budget, notes, bien associé)
 - **Biens** — Consultation et gestion des propriétés avec photo, fiche détail par bien
-- **Authentification** — Inscription, connexion, token JWT stocké de façon sécurisée (expo-secure-store)
+- **Authentification** — Inscription, connexion, token JWT stocké de façon sécurisée (expo-secure-store sur iOS/Android, localStorage sur web)
 
 ## Stack technique
 
@@ -35,7 +35,8 @@ Application mobile de gestion de leads immobiliers, développée avec React Nati
 | Navigation | Expo Router (basée sur les fichiers) |
 | Langage | TypeScript |
 | HTTP | fetch natif + wrapper `apiFetch` avec JWT |
-| Stockage token | expo-secure-store |
+| Stockage token | expo-secure-store (iOS/Android) · localStorage (web) |
+| Plateformes | iOS · Android · Web (react-native-web) |
 | Backend | API REST Node.js/Express + PostgreSQL |
 
 ## Démarrage
@@ -45,6 +46,7 @@ npm install
 npm start        # Serveur de développement Expo
 npm run android  # Android
 npm run ios      # iOS
+npm run web      # Navigateur (react-native-web)
 ```
 
 Configurer l'URL de l'API dans [app/constants/config.ts](LeadImmo/app/constants/config.ts) :
@@ -73,14 +75,17 @@ LeadImmo/
     │       └── [id].tsx             # Fiche détail bien
     ├── components/                  # Composants réutilisables
     │   ├── AppText.tsx
+    │   ├── Field.tsx               # Champ de formulaire générique
     │   ├── LeadCard.tsx
     │   └── Screen.tsx
+    ├── styles/
+    │   └── leadForm.ts             # Styles partagés des modales leads
     ├── constants/
     │   ├── api.ts                   # Wrapper HTTP avec auth JWT
     │   ├── config.ts                # URL de l'API
     │   └── theme.ts                 # Couleurs et styles globaux
     ├── services/                    # Couche d'accès à l'API
-    │   ├── auth.ts                  # login / saveToken / getToken
+    │   ├── auth.ts                  # login / register / saveToken / getToken
     │   ├── leads.ts                 # CRUD leads
     │   └── properties.ts            # CRUD propriétés (+ upload image)
     ├── types/                       # Types TypeScript
@@ -93,6 +98,12 @@ LeadImmo/
 ## Authentification
 
 Le flux est le suivant :
+
+**Inscription**
+1. `register.tsx` appelle `services/auth.ts → register()` qui POST sur `/auth/createAccount`
+2. En cas de succès, l'utilisateur est redirigé vers l'écran de connexion
+
+**Connexion**
 1. `login.tsx` appelle `services/auth.ts → login()` qui POST sur `/auth/login`
 2. Le token JWT reçu est sauvegardé via `saveToken()` dans le SecureStore
 3. Chaque requête API passe par `apiFetch()` qui lit le token et l'injecte en header `Authorization: Bearer <token>`

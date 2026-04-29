@@ -1,9 +1,10 @@
 import { useState } from 'react'
-import { View, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
+import { View, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native'
 import { router } from 'expo-router'
 import { colors, typography, spacing } from '../constants/theme'
 import Screen from '../components/Screen'
 import AppText from '../components/AppText'
+import { register } from '../services/auth'
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -17,8 +18,10 @@ export default function Register() {
   const [confirm, setConfirm] = useState('')
   const [errors, setErrors] = useState<FormErrors>({})
   const [done, setDone] = useState(false)
+  const [loading, setLoading] = useState(false)
+  const [apiError, setApiError] = useState<string | null>(null)
 
-  function validate(): FormErrors {
+  const validate = (): FormErrors => {
     const e: FormErrors = {}
     if (!email) e.email = 'Email requis'
     else if (!isValidEmail(email)) e.email = 'Format email invalide'
@@ -29,10 +32,21 @@ export default function Register() {
     return e
   }
 
-  function handleSubmit() {
+  const handleSubmit = async () => {
     const e = validate()
     setErrors(e)
-    if (Object.keys(e).length === 0) setDone(true)
+    if (Object.keys(e).length > 0) return
+
+    setLoading(true)
+    setApiError(null)
+    try {
+      await register(email, password)
+      setDone(true)
+    } catch (err: any) {
+      setApiError(err.message ?? 'Une erreur est survenue')
+    } finally {
+      setLoading(false)
+    }
   }
 
   if (done) {
@@ -99,8 +113,13 @@ export default function Register() {
           {errors.confirm ? <AppText style={styles.errorText}>{errors.confirm}</AppText> : null}
         </View>
 
-        <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-          <AppText style={styles.buttonText}>Créer mon compte</AppText>
+        {apiError ? <AppText style={styles.errorText}>{apiError}</AppText> : null}
+
+        <TouchableOpacity style={[styles.button, loading && { opacity: 0.7 }]} onPress={handleSubmit} disabled={loading}>
+          {loading
+            ? <ActivityIndicator color={colors.white} />
+            : <AppText style={styles.buttonText}>Créer mon compte</AppText>
+          }
         </TouchableOpacity>
 
         <View style={styles.loginRow}>
