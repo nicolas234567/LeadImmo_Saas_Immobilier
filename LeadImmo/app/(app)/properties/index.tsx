@@ -7,6 +7,7 @@ import Screen from '../../components/Screen'
 import AppText from '../../components/AppText'
 import { getProperties, createProperty } from '../../services/properties'
 import { colors, spacing, radius } from '../../constants/theme'
+import { API_URL } from '../../constants/api'
 import type { PropertyStatus } from '../../types/property'
 
 const STATUS_LABELS: Record<string, string> = {
@@ -112,9 +113,9 @@ export default function Properties() {
             onPress={() => router.push(`/(app)/properties/${property.id}`)}
             activeOpacity={0.8}
           >
-            {property.image ? (
+            {property.image_mimetype ? (
               <Image
-                source={typeof property.image === 'string' ? { uri: property.image } : property.image}
+                source={{ uri: `${API_URL}/properties/${property.id}/image` }}
                 style={styles.image}
               />
             ) : null}

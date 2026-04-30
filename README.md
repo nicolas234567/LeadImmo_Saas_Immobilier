@@ -35,7 +35,7 @@ Application mobile de gestion de leads immobiliers, développée avec React Nati
 | Navigation | Expo Router (basée sur les fichiers) |
 | Langage | TypeScript |
 | HTTP | fetch natif + wrapper `apiFetch` avec JWT |
-| Stockage token | expo-secure-store (iOS/Android) · localStorage (web) |
+| Stockage token | expo-secure-store (iOS/Android) · sessionStorage (web uniquement pour la démo) |
 | Plateformes | iOS · Android · Web (react-native-web) |
 | Backend | API REST Node.js/Express + PostgreSQL |
 
@@ -108,7 +108,3 @@ Le flux est le suivant :
 2. Le token JWT reçu est sauvegardé via `saveToken()` dans le SecureStore
 3. Chaque requête API passe par `apiFetch()` qui lit le token et l'injecte en header `Authorization: Bearer <token>`
 4. Si le token est absent ou expiré, l'API répond 401/403 et l'application redirige vers la connexion
-
-## Variables d'environnement
-
-Aucune variable d'environnement côté mobile. Seule la constante `API_URL` dans `app/constants/config.ts` est à adapter à votre réseau local.
