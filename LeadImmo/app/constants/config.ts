@@ -1,1 +1,1 @@
-export const API_URL = 'http://192.168.39.79:3000'
+export const API_URL = 'https://api.leadimmo.nicolasbregevin.com'
