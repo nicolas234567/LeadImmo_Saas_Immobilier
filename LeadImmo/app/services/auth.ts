@@ -26,11 +26,11 @@ export async function login(email: string, password: string): Promise<string> {
   return data.token
 }
 
-export async function register(email: string, password: string): Promise<void> {
+export async function register(email: string, password: string, agencyName: string): Promise<void> {
   const res = await fetch(`${API_URL}/auth/createAccount`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify({ email, password, agency_name: agencyName }),
   })
 
   const text = await res.text()

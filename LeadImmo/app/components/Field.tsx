@@ -3,13 +3,14 @@ import AppText from './AppText'
 import { leadFormStyles as s } from '../styles/leadForm'
 
 export default function Field({
-  label, value, onChangeText, keyboardType, multiline,
+  label, value, onChangeText, keyboardType, multiline, secureTextEntry,
 }: {
   label: string
   value: string
   onChangeText: (v: string) => void
   keyboardType?: 'default' | 'email-address' | 'phone-pad' | 'numeric'
   multiline?: boolean
+  secureTextEntry?: boolean
 }) {
   return (
     <View style={s.fieldWrapper}>
@@ -21,6 +22,7 @@ export default function Field({
         keyboardType={keyboardType ?? 'default'}
         autoCapitalize="none"
         multiline={multiline}
+        secureTextEntry={secureTextEntry}
       />
     </View>
   )

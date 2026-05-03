@@ -40,6 +40,18 @@ export default function AppLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+        name="settings"
+        options={{
+          title: 'Paramètres',
+          tabBarIcon: ({ size, color }) => (
+            <Image
+              source={require('../../assets/images/icons/settings.png')}
+              style={{ width: size, height: size, tintColor: color }}
+            />
+          ),
+        }}
+      />
       <Tabs.Screen name="leads/[id]" options={{ href: null }} />
       <Tabs.Screen name="properties/[id]" options={{ href: null }} />
     </Tabs>

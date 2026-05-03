@@ -10,9 +10,10 @@ function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
 }
 
-type FormErrors = { email?: string; password?: string; confirm?: string }
+type FormErrors = { agencyName?: string; email?: string; password?: string; confirm?: string }
 
 export default function Register() {
+  const [agencyName, setAgencyName] = useState('')
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [confirm, setConfirm] = useState('')
@@ -23,6 +24,7 @@ export default function Register() {
 
   const validate = (): FormErrors => {
     const e: FormErrors = {}
+    if (!agencyName) e.agencyName = "Nom de l'agence requis"
     if (!email) e.email = 'Email requis'
     else if (!isValidEmail(email)) e.email = 'Format email invalide'
     if (!password) e.password = 'Mot de passe requis'
@@ -40,7 +42,7 @@ export default function Register() {
     setLoading(true)
     setApiError(null)
     try {
-      await register(email, password)
+      await register(email, password, agencyName)
       setDone(true)
     } catch (err: any) {
       setApiError(err.message ?? 'Une erreur est survenue')
@@ -73,6 +75,19 @@ export default function Register() {
       <AppText style={typography.title}>Créer un compte</AppText>
 
       <View style={styles.form}>
+        <View style={styles.field}>
+          <AppText style={styles.label}>Nom de l'agence</AppText>
+          <TextInput
+            style={[styles.input, errors.agencyName ? styles.inputError : null]}
+            placeholder="Nom de votre agence"
+            placeholderTextColor={colors.lightGray}
+            autoCapitalize="words"
+            value={agencyName}
+            onChangeText={t => { setAgencyName(t); setErrors(e => ({ ...e, agencyName: undefined })) }}
+          />
+          {errors.agencyName ? <AppText style={styles.errorText}>{errors.agencyName}</AppText> : null}
+        </View>
+
         <View style={styles.field}>
           <AppText style={styles.label}>Email</AppText>
           <TextInput
