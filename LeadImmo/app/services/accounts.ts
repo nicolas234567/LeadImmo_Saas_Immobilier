@@ -9,7 +9,7 @@ export async function getAccounts(): Promise<Account[]> {
 
 export async function createAgencyAccount(email: string, password: string): Promise<void> {
   const token = await getToken()
-  const res = await fetch(`${API_URL}/auth/createAccountAgency`, {
+  const res = await fetch(`${API_URL}/auth/createAccount`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
