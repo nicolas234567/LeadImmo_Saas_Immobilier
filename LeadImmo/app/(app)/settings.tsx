@@ -57,6 +57,7 @@ export default function Settings() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteAccount(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['accounts'] }),
+    onError: (err: Error) => setApiError(err.message ?? 'Erreur lors de la suppression'),
   })
 
   function validateCreate(): Partial<CreateForm> {
@@ -91,6 +92,7 @@ export default function Settings() {
   }
 
   function confirmDelete(account: Account) {
+    setApiError(null)
     Alert.alert(
       'Supprimer le compte',
       `Supprimer le compte ${account.email} ?`,
@@ -111,6 +113,10 @@ export default function Settings() {
       </View>
 
       <AppText style={styles.sectionLabel}>Comptes de l'agence</AppText>
+
+      {apiError && !creating && !editing && (
+        <AppText style={styles.error}>{apiError}</AppText>
+      )}
 
       {isLoading && <ActivityIndicator color={colors.white} style={{ marginTop: spacing.md }} />}
 
