@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { View, StyleSheet, ActivityIndicator, TouchableOpacity, Modal, ScrollView, Alert } from 'react-native'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Screen from '../components/Screen'
 import AppText from '../components/AppText'
 import Field from '../components/Field'
 import { getAccounts, createAgencyAccount, updateAccount, deleteAccount } from '../services/accounts'
+import { useFocusEffect } from 'expo-router'
 import { colors, spacing, radius } from '../constants/theme'
 import { leadFormStyles as lf } from '../styles/leadForm'
 import type { Account } from '../types/account'
@@ -57,8 +58,11 @@ export default function Settings() {
   const deleteMutation = useMutation({
     mutationFn: (id: string) => deleteAccount(id),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['accounts'] }),
-    onError: (err: Error) => setApiError(err.message ?? 'Erreur lors de la suppression'),
   })
+
+  useFocusEffect(useCallback(() => {
+    deleteMutation.reset()
+  }, []))
 
   function validateCreate(): Partial<CreateForm> {
     const e: Partial<CreateForm> = {}
@@ -92,7 +96,6 @@ export default function Settings() {
   }
 
   function confirmDelete(account: Account) {
-    setApiError(null)
     Alert.alert(
       'Supprimer le compte',
       `Supprimer le compte ${account.email} ?`,
@@ -113,10 +116,6 @@ export default function Settings() {
       </View>
 
       <AppText style={styles.sectionLabel}>Comptes de l'agence</AppText>
-
-      {apiError && !creating && !editing && (
-        <AppText style={styles.error}>{apiError}</AppText>
-      )}
 
       {isLoading && <ActivityIndicator color={colors.white} style={{ marginTop: spacing.md }} />}
 
