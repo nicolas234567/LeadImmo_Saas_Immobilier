@@ -1,20 +1,13 @@
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import { View, StyleSheet, ActivityIndicator, TouchableOpacity, Modal, ScrollView, Alert } from 'react-native'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Screen from '../components/Screen'
 import AppText from '../components/AppText'
 import Field from '../components/Field'
 import { getAccounts, createAgencyAccount, updateAccount, deleteAccount } from '../services/accounts'
-import { useFocusEffect } from 'expo-router'
 import { colors, spacing, radius } from '../constants/theme'
 import { leadFormStyles as lf } from '../styles/leadForm'
 import type { Account } from '../types/account'
-
-type CreateForm = { email: string; password: string; confirm: string }
-type EditForm   = { email: string }
-
-const EMPTY_CREATE: CreateForm = { email: '', password: '', confirm: '' }
-const EMPTY_EDIT:   EditForm   = { email: '' }
 
 function isValidEmail(email: string) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
@@ -22,12 +15,18 @@ function isValidEmail(email: string) {
 
 export default function Settings() {
   const queryClient = useQueryClient()
-  const [creating, setCreating]   = useState(false)
-  const [editing, setEditing]     = useState<Account | null>(null)
-  const [createForm, setCreateForm] = useState<CreateForm>(EMPTY_CREATE)
-  const [editForm, setEditForm]   = useState<EditForm>(EMPTY_EDIT)
-  const [createErrors, setCreateErrors] = useState<Partial<CreateForm>>({})
-  const [apiError, setApiError]   = useState<string | null>(null)
+
+  const [creating, setCreating]     = useState(false)
+  const [editing, setEditing]       = useState<Account | null>(null)
+  const [deletingId, setDeletingId] = useState<string | null>(null)
+
+  const [email, setEmail]       = useState('')
+  const [password, setPassword] = useState('')
+  const [confirm, setConfirm]   = useState('')
+  const [editEmail, setEditEmail] = useState('')
+
+  const [createErrors, setCreateErrors] = useState<Record<string, string>>({})
+  const [apiError, setApiError]         = useState<string | null>(null)
 
   const { data: accounts = [], isLoading, isError, error } = useQuery({
     queryKey: ['accounts'],
@@ -35,18 +34,18 @@ export default function Settings() {
   })
 
   const createMutation = useMutation({
-    mutationFn: () => createAgencyAccount(createForm.email, createForm.password),
+    mutationFn: () => createAgencyAccount(email, password),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] })
       setCreating(false)
-      setCreateForm(EMPTY_CREATE)
+      setEmail(''); setPassword(''); setConfirm('')
       setApiError(null)
     },
     onError: (err: Error) => setApiError(err.message ?? 'Erreur lors de la création'),
   })
 
   const updateMutation = useMutation({
-    mutationFn: () => updateAccount(editing!.id, editForm.email),
+    mutationFn: () => updateAccount(editing!.id, editEmail),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['accounts'] })
       setEditing(null)
@@ -55,23 +54,14 @@ export default function Settings() {
     onError: (err: Error) => setApiError(err.message ?? 'Erreur lors de la modification'),
   })
 
-  const deleteMutation = useMutation({
-    mutationFn: (id: string) => deleteAccount(id),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['accounts'] }),
-  })
-
-  useFocusEffect(useCallback(() => {
-    deleteMutation.reset()
-  }, []))
-
-  function validateCreate(): Partial<CreateForm> {
-    const e: Partial<CreateForm> = {}
-    if (!createForm.email) e.email = 'Email requis'
-    else if (!isValidEmail(createForm.email)) e.email = 'Format invalide'
-    if (!createForm.password) e.password = 'Mot de passe requis'
-    else if (createForm.password.length < 8) e.password = 'Minimum 8 caractères'
-    if (!createForm.confirm) e.confirm = 'Confirmation requise'
-    else if (createForm.confirm !== createForm.password) e.confirm = 'Les mots de passe ne correspondent pas'
+  function validateCreate(): Record<string, string> {
+    const e: Record<string, string> = {}
+    if (!email)                          e.email    = 'Email requis'
+    else if (!isValidEmail(email))       e.email    = 'Format invalide'
+    if (!password)                       e.password = 'Mot de passe requis'
+    else if (password.length < 8)        e.password = 'Minimum 8 caractères'
+    if (!confirm)                        e.confirm  = 'Confirmation requise'
+    else if (confirm !== password)       e.confirm  = 'Les mots de passe ne correspondent pas'
     return e
   }
 
@@ -85,12 +75,15 @@ export default function Settings() {
 
   function openEdit(account: Account) {
     setEditing(account)
-    setEditForm({ email: account.email })
+    setEditEmail(account.email)
     setApiError(null)
   }
 
   function handleUpdate() {
-    if (!editForm.email || !isValidEmail(editForm.email)) return
+    if (!editEmail || !isValidEmail(editEmail)) {
+      setApiError('Email invalide')
+      return
+    }
     setApiError(null)
     updateMutation.mutate()
   }
@@ -101,7 +94,19 @@ export default function Settings() {
       `Supprimer le compte ${account.email} ?`,
       [
         { text: 'Annuler', style: 'cancel' },
-        { text: 'Supprimer', style: 'destructive', onPress: () => deleteMutation.mutate(account.id) },
+        {
+          text: 'Supprimer',
+          style: 'destructive',
+          onPress: async () => {
+            setDeletingId(account.id)
+            try {
+              await deleteAccount(account.id)
+              queryClient.invalidateQueries({ queryKey: ['accounts'] })
+            } finally {
+              setDeletingId(null)
+            }
+          },
+        },
       ]
     )
   }
@@ -110,7 +115,10 @@ export default function Settings() {
     <Screen>
       <View style={styles.header}>
         <AppText style={styles.title}>Paramètres</AppText>
-        <TouchableOpacity style={styles.btnNew} onPress={() => { setCreating(true); setApiError(null) }}>
+        <TouchableOpacity
+          style={styles.btnNew}
+          onPress={() => { setCreating(true); setApiError(null); setCreateErrors({}) }}
+        >
           <AppText style={styles.btnNewText}>+ Nouveau</AppText>
         </TouchableOpacity>
       </View>
@@ -137,11 +145,13 @@ export default function Settings() {
                 <AppText style={styles.btnEditText}>Modifier</AppText>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[styles.btnDelete, deleteMutation.isPending && { opacity: 0.5 }]}
+                style={[styles.btnDelete, deletingId === account.id && { opacity: 0.5 }]}
                 onPress={() => confirmDelete(account)}
-                disabled={deleteMutation.isPending}
+                disabled={deletingId === account.id}
               >
-                <AppText style={styles.btnDeleteText}>Supprimer</AppText>
+                <AppText style={styles.btnDeleteText}>
+                  {deletingId === account.id ? '...' : 'Supprimer'}
+                </AppText>
               </TouchableOpacity>
             </View>
           </View>
@@ -155,24 +165,24 @@ export default function Settings() {
 
           <Field
             label="Email"
-            value={createForm.email}
-            onChangeText={v => { setCreateForm(f => ({ ...f, email: v })); setCreateErrors(e => ({ ...e, email: undefined })) }}
+            value={email}
+            onChangeText={v => { setEmail(v); setCreateErrors(e => ({ ...e, email: '' })) }}
             keyboardType="email-address"
           />
           {createErrors.email ? <AppText style={lf.errorText}>{createErrors.email}</AppText> : null}
 
           <Field
             label="Mot de passe"
-            value={createForm.password}
-            onChangeText={v => { setCreateForm(f => ({ ...f, password: v })); setCreateErrors(e => ({ ...e, password: undefined })) }}
+            value={password}
+            onChangeText={v => { setPassword(v); setCreateErrors(e => ({ ...e, password: '' })) }}
             secureTextEntry
           />
           {createErrors.password ? <AppText style={lf.errorText}>{createErrors.password}</AppText> : null}
 
           <Field
             label="Confirmer le mot de passe"
-            value={createForm.confirm}
-            onChangeText={v => { setCreateForm(f => ({ ...f, confirm: v })); setCreateErrors(e => ({ ...e, confirm: undefined })) }}
+            value={confirm}
+            onChangeText={v => { setConfirm(v); setCreateErrors(e => ({ ...e, confirm: '' })) }}
             secureTextEntry
           />
           {createErrors.confirm ? <AppText style={lf.errorText}>{createErrors.confirm}</AppText> : null}
@@ -180,7 +190,10 @@ export default function Settings() {
           {apiError ? <AppText style={lf.errorText}>{apiError}</AppText> : null}
 
           <View style={lf.modalActions}>
-            <TouchableOpacity style={lf.btnCancel} onPress={() => { setCreating(false); setCreateForm(EMPTY_CREATE); setCreateErrors({}) }}>
+            <TouchableOpacity
+              style={lf.btnCancel}
+              onPress={() => { setCreating(false); setEmail(''); setPassword(''); setConfirm(''); setCreateErrors({}) }}
+            >
               <AppText style={lf.btnCancelText}>Annuler</AppText>
             </TouchableOpacity>
             <TouchableOpacity
@@ -203,8 +216,8 @@ export default function Settings() {
 
           <Field
             label="Email"
-            value={editForm.email}
-            onChangeText={v => setEditForm({ email: v })}
+            value={editEmail}
+            onChangeText={v => { setEditEmail(v); setApiError(null) }}
             keyboardType="email-address"
           />
 
