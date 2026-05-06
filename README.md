@@ -121,7 +121,7 @@ Le projet tourne sur `npm run web` sans modification supplémentaire. Les adapta
 | Sujet | Fichier | Solution |
 |---|---|---|
 | `Alert.alert` inexistant sur web | `utils/alert.ts` | `crossAlert()` — `window.confirm`/`window.alert` sur web, `Alert.alert` sur mobile |
-| Permissions galerie (`expo-image-picker`) | `properties/index.tsx`, `properties/[id].tsx` | `requestMediaLibraryPermissionsAsync` ignoré sur web (`Platform.OS !== 'web'`), le navigateur gère nativement |
+| Permissions galerie (`expo-image-picker`) | `properties/index.tsx`, `properties/[id].tsx` | `requestMediaLibraryPermissionsAsync` ignoré sur web (`Platform.OS !== 'web'`), le navigateur gère nativement en version web |
 | Stockage token (`expo-secure-store`) | `services/auth.ts` | Fallback `sessionStorage` sur web |
 | Upload image (`FormData`) | `services/properties.ts` | Gestion Blob/URI selon `Platform.OS` |
 | Réponses `204 No Content` | `constants/api.ts` | `apiFetch` retourne `undefined` au lieu d'appeler `res.json()` sur un body vide |
