@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { View, StyleSheet, ActivityIndicator, TouchableOpacity, Modal, ScrollView, Alert } from 'react-native'
+import { View, StyleSheet, ActivityIndicator, TouchableOpacity, Modal, ScrollView } from 'react-native'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Screen from '../components/Screen'
 import AppText from '../components/AppText'
 import Field from '../components/Field'
 import { getAccounts, createAgencyAccount, updateAccount, deleteAccount } from '../services/accounts'
 import { colors, spacing, radius } from '../constants/theme'
+import { crossAlert } from '../utils/alert'
 import { leadFormStyles as lf } from '../styles/leadForm'
 import type { Account } from '../types/account'
 
@@ -89,7 +90,7 @@ export default function Settings() {
   }
 
   function confirmDelete(account: Account) {
-    Alert.alert(
+    crossAlert(
       'Supprimer le compte',
       `Supprimer le compte ${account.email} ?`,
       [
@@ -102,6 +103,8 @@ export default function Settings() {
             try {
               await deleteAccount(account.id)
               queryClient.invalidateQueries({ queryKey: ['accounts'] })
+            } catch (err) {
+              crossAlert('Erreur', (err as Error).message ?? 'Impossible de supprimer le compte')
             } finally {
               setDeletingId(null)
             }

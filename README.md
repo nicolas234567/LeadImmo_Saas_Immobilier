@@ -36,7 +36,8 @@ Application mobile de gestion de leads immobiliers, développée avec React Nati
 | Langage | TypeScript |
 | HTTP | fetch natif + wrapper `apiFetch` avec JWT |
 | Stockage token | expo-secure-store (iOS/Android) · sessionStorage (web uniquement pour la démo) |
-| Plateformes | iOS · Android · Web (react-native-web) |
+| Plateformes | iOS · Android · **Web** (react-native-web) |
+| Alertes cross-platform | `utils/alert.ts` — `crossAlert()` |
 | Backend | API REST Node.js/Express + PostgreSQL |
 
 ## Démarrage
@@ -67,6 +68,7 @@ LeadImmo/
     │   └── confirmationResetMdp.tsx
     ├── (app)/                       # Écrans authentifiés
     │   ├── dashboard.tsx
+    │   ├── settings.tsx             # Gestion des comptes agence
     │   ├── leads/
     │   │   ├── index.tsx            # Liste des leads
     │   │   └── [id].tsx             # Fiche détail lead
@@ -86,11 +88,14 @@ LeadImmo/
     │   └── theme.ts                 # Couleurs et styles globaux
     ├── services/                    # Couche d'accès à l'API
     │   ├── auth.ts                  # login / register / saveToken / getToken
+    │   ├── accounts.ts              # CRUD comptes agence
     │   ├── leads.ts                 # CRUD leads
     │   └── properties.ts            # CRUD propriétés (+ upload image)
     ├── types/                       # Types TypeScript
     │   ├── lead.ts
     │   └── property.ts
+    ├── utils/
+    │   └── alert.ts                 # crossAlert() — Alert.alert sur mobile, window.confirm/alert sur web
     ├── index.tsx                    # Point d'entrée (redirection auth)
     └── _layout.tsx                  # Layout racine
 ```
@@ -108,3 +113,15 @@ Le flux est le suivant :
 2. Le token JWT reçu est sauvegardé via `saveToken()` dans le SecureStore
 3. Chaque requête API passe par `apiFetch()` qui lit le token et l'injecte en header `Authorization: Bearer <token>`
 4. Si le token est absent ou expiré, l'API répond 401/403 et l'application redirige vers la connexion
+
+## Compatibilité Web
+
+Le projet tourne sur `npm run web` sans modification supplémentaire. Les adaptations cross-platform en place :
+
+| Sujet | Fichier | Solution |
+|---|---|---|
+| `Alert.alert` inexistant sur web | `utils/alert.ts` | `crossAlert()` — `window.confirm`/`window.alert` sur web, `Alert.alert` sur mobile |
+| Permissions galerie (`expo-image-picker`) | `properties/index.tsx`, `properties/[id].tsx` | `requestMediaLibraryPermissionsAsync` ignoré sur web (`Platform.OS !== 'web'`), le navigateur gère nativement |
+| Stockage token (`expo-secure-store`) | `services/auth.ts` | Fallback `sessionStorage` sur web |
+| Upload image (`FormData`) | `services/properties.ts` | Gestion Blob/URI selon `Platform.OS` |
+| Réponses `204 No Content` | `constants/api.ts` | `apiFetch` retourne `undefined` au lieu d'appeler `res.json()` sur un body vide |

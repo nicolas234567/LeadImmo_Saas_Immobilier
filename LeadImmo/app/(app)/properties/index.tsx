@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, Image, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Modal, ScrollView, TextInput, Alert } from 'react-native'
+import { View, Image, Text, StyleSheet, TouchableOpacity, ActivityIndicator, Modal, ScrollView, TextInput, Platform } from 'react-native'
 import { router } from 'expo-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import * as ImagePicker from 'expo-image-picker'
@@ -7,6 +7,7 @@ import Screen from '../../components/Screen'
 import AppText from '../../components/AppText'
 import { getProperties, createProperty } from '../../services/properties'
 import { colors, spacing, radius } from '../../constants/theme'
+import { crossAlert } from '../../utils/alert'
 import { API_URL } from '../../constants/api'
 import type { PropertyStatus } from '../../types/property'
 
@@ -69,10 +70,12 @@ export default function Properties() {
   })
 
   async function pickImage() {
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
-    if (status !== 'granted') {
-      Alert.alert('Permission refusée', 'L\'accès à la galerie est requis.')
-      return
+    if (Platform.OS !== 'web') {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync()
+      if (status !== 'granted') {
+        crossAlert('Permission refusée', "L'accès à la galerie est requis.")
+        return
+      }
     }
     const result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: ['images'],

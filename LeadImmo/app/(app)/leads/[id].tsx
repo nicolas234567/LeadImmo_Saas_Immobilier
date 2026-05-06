@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { View, StyleSheet, TouchableOpacity, ActivityIndicator, Modal, ScrollView, Alert } from 'react-native'
+import { View, StyleSheet, TouchableOpacity, ActivityIndicator, Modal, ScrollView } from 'react-native'
 import { useLocalSearchParams, router } from 'expo-router'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import Screen from '../../components/Screen'
@@ -10,6 +10,7 @@ import { getProperties } from '../../services/properties'
 import { STATUS_COLORS, STATUS_LABELS } from '../../components/LeadCard'
 import { colors, spacing, radius } from '../../constants/theme'
 import { leadFormStyles as lf } from '../../styles/leadForm'
+import { crossAlert } from '../../utils/alert'
 import { STATUSES } from '../../types/lead'
 import type { LeadStatus } from '../../types/lead'
 
@@ -87,7 +88,7 @@ export default function LeadDetail() {
   }
 
   function handleDelete() {
-    Alert.alert('Supprimer ce lead ?', 'Cette action est irréversible.', [
+    crossAlert('Supprimer ce lead ?', 'Cette action est irréversible.', [
       { text: 'Annuler', style: 'cancel' },
       { text: 'Supprimer', style: 'destructive', onPress: () => deleteMutation.mutate() },
     ])
