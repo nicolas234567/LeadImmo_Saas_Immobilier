@@ -23,6 +23,9 @@ export async function login(email: string, password: string): Promise<string> {
     throw new Error(data.error ?? 'Erreur de connexion')
   }
 
+  await deleteToken()
+  await saveToken(data.token)
+
   return data.token
 }
 
